@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+ name: mongodb-volume
+ labels:
+   type: local
+spec:
+ storageClassName: ""
+ capacity:
+   storage: 1Gi
+ accessModes:
+   - ReadWriteOnce
+ hostPath:
+   path: "/run/desktop/mnt/host/c/Users/aak/Documents/itqbase_docu/fvv_wp/kubernetes/fullstackapp/dbdata"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+ name: mongodb-volume-claim
+spec:
+ storageClassName: ""
+ accessModes:
+   - ReadWriteOnce
+ resources:
+   requests:
+     storage: 50Mi

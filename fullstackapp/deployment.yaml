@@ -1,0 +1,77 @@
+apiVersion: apps/v1 
+kind: Deployment
+metadata: 
+  name: todo-mongodb
+  labels:
+    app: todo-mongodb
+spec: 
+  replicas: 1
+  selector: 
+    matchLabels: 
+      app: todo-mongodb
+  template:
+    metadata:
+      labels:
+        app: todo-mongodb
+    spec:
+      containers:
+      - name: todo-mongodb
+        image: mongo
+        ports:
+        - containerPort: 27017
+        env:
+        - name: MONGO_INITDB_DATABASE
+          valueFrom: 
+            configMapKeyRef:
+              name: mongodb-configmap
+              key: mongo-initdb-database
+        volumeMounts:
+        - name: mongodb-volume
+          mountPath: /data/db
+      volumes:
+      - name: mongodb-volume
+        persistentVolumeClaim:
+          claimName: mongodb-volume-claim
+--- 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo-list
+  labels:
+    app: todo-list
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: todo-list
+  template:
+    metadata: 
+      labels:
+        app: todo-list
+    spec:
+      containers:
+      - name: todo-list
+        image: amaraiheanacho/amaratodo:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: DEPLOYMENT
+          valueFrom:
+            configMapKeyRef:
+              name: todo-configmap
+              key: deployment
+        - name: ENVIRONMENT
+          valueFrom: 
+            configMapKeyRef:
+              name: todo-configmap
+              key: environment
+        - name: DB
+          valueFrom:
+            configMapKeyRef:
+              name: todo-configmap
+              key: db
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+                name: todo-configmap
+                key: db_name
